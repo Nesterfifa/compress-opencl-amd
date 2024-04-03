@@ -1,0 +1,3 @@
+/home/nesterfifa/itmo/compress-opencl-amd/build/CMakeFiles/compress-ocl.dir
+/home/nesterfifa/itmo/compress-opencl-amd/build/CMakeFiles/edit_cache.dir
+/home/nesterfifa/itmo/compress-opencl-amd/build/CMakeFiles/rebuild_cache.dir

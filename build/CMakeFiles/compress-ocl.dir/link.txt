@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/compress-ocl.dir/src/solution.cpp.o -o compress-ocl  -Wl,-rpath,/home/nesterfifa/itmo/compress-opencl-amd/include/OpenCL-ICD-Loader/install/lib /usr/lib/x86_64-linux-gnu/liblzma.so ../include/OpenCL-ICD-Loader/install/lib/libOpenCL.so.1.2 -ldl 
