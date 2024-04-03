@@ -1,15 +1,12 @@
 #pragma once
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <lzma.h>
-#include <sstream>
-#include <CL/opencl.hpp>
 
-std::vector<uint8_t> decompressData(const std::string& compressed_data) {
-    std::vector<uint8_t> decompressed_data;
+std::vector<unsigned char> decompressData(const std::string& compressed_data) {
+    std::vector<unsigned char> decompressed_data;
 
     lzma_stream stream = LZMA_STREAM_INIT;
     lzma_ret ret = lzma_stream_decoder(&stream, UINT64_MAX, LZMA_CONCATENATED);
@@ -19,10 +16,10 @@ std::vector<uint8_t> decompressData(const std::string& compressed_data) {
         return decompressed_data;
     }
 
-    stream.next_in = reinterpret_cast<const uint8_t*>(compressed_data.data());
+    stream.next_in = reinterpret_cast<const unsigned char*>(compressed_data.data());
     stream.avail_in = compressed_data.size();
 
-    std::vector<uint8_t> out_buffer(1024 * 1024);
+    std::vector<unsigned char> out_buffer(1024 * 1024);
     stream.next_out = out_buffer.data();
     stream.avail_out = out_buffer.size();
 

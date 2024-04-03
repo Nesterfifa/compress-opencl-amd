@@ -1,11 +1,7 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <lzma.h>
-#include <sstream>
-#include <CL/opencl.hpp>
 #include <compress.h>
+#include <sstream>
+#include <fstream>
+#include <CL/opencl.hpp>
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -23,7 +19,7 @@ int main(int argc, char* argv[]) {
     compressed_kernel_stream << kernel_file.rdbuf();
     std::string compressed_kernel = compressed_kernel_stream.str();
 
-    std::vector<uint8_t> decompressed_kernel;
+    std::vector<unsigned char> decompressed_kernel;
     try {
         decompressed_kernel = decompressData(compressed_kernel);
     } catch (const std::exception& e) {
@@ -51,13 +47,14 @@ int main(int argc, char* argv[]) {
 
 
         cl::Program::Binaries binaries;
-        binaries.push_back(std::vector<uint8_t>(compressed_kernel.begin(), compressed_kernel.end()));
+        binaries.push_back(std::vector<unsigned char>(compressed_kernel.begin(), compressed_kernel.end()));
         cl_int err;
         cl::Program program(context, devices, binaries, NULL, &err);
         std::cout << err << std::endl;
 
         err = program.build();
         if (err != CL_SUCCESS) {
+            std::cout << err << std::endl;
             size_t log_size;
             clGetProgramBuildInfo(program.get(), device.get(), CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
 
@@ -81,7 +78,7 @@ int main(int argc, char* argv[]) {
         kernel.setArg(2, 4);
         kernel.setArg(3, buffer_y);
 
-        queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NullRange, cl::NullRange);
+        queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
 
         queue.finish();
 
