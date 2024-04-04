@@ -4,8 +4,8 @@
 #include <CL/opencl.hpp>
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <compressed_kernel.cl.xz>" << "<kernel_name>" << std::endl;
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <compressed_kernel.cl.xz>" << std::endl;
         return 1;
     }
 
@@ -65,14 +65,14 @@ int main(int argc, char* argv[]) {
             printf("%s\n", log);
         }
         
-        cl::Kernel kernel(program, argv[2], &err);
+        cl::Kernel kernel(program, "matvec", &err);
 
         cl_float A[16] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0};
         cl_float x[4] = {1.0, 2.0, 3.0, 4.0};
         cl_float y[4] = {0.0, 0.0, 0.0, 0.0};
-        cl::Buffer buffer_A(context, CL_MEM_READ_ONLY, sizeof(A), A);
-        cl::Buffer buffer_x(context, CL_MEM_READ_ONLY, sizeof(x), x);
-        cl::Buffer buffer_y(context, CL_MEM_WRITE_ONLY, sizeof(y), y);
+        cl::Buffer buffer_A(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(A), A);
+        cl::Buffer buffer_x(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(x), x);
+        cl::Buffer buffer_y(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(y), y);
         kernel.setArg(0, buffer_A);
         kernel.setArg(1, buffer_x);
         kernel.setArg(2, 4);

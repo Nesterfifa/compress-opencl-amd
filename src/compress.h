@@ -5,7 +5,7 @@
 #include <vector>
 #include <lzma.h>
 
-std::vector<unsigned char> decompressData(const std::string& compressed_data) {
+inline std::vector<unsigned char> decompressData(const std::string& compressed_data) {
     std::vector<unsigned char> decompressed_data;
 
     lzma_stream stream = LZMA_STREAM_INIT;
