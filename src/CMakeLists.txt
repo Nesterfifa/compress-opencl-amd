@@ -1,4 +1,4 @@
-add_executable(compress-ocl-src solution.cpp)
+add_executable(compress-ocl-src unify.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 

@@ -2,7 +2,7 @@
 -rwxr-xr-x 1 nesterfifa nesterfifa  2620 Apr  4 12:35 nbody_gpu.bin.bz2
 -rwxr-xr-x 1 nesterfifa nesterfifa  2352 Apr  4 12:35 nbody_gpu.bin.gz
 -rwxr-xr-x 1 nesterfifa nesterfifa  2074 Apr  4 12:35 nbody_gpu.bin.lzma
--rwxr-xr-x 1 nesterfifa nesterfifa  2120 Apr  4 12:35 nbody_gpu.bin.xz
+-rwxr-xr-x 1 nesterfifa nesterfifa  2120 Apr  4 12:35 nbody_gpu.bin.xzgit
 -rwxr-xr-x 1 nesterfifa nesterfifa  2260 Apr  4 12:35 nbody_gpu.bin.zst
 -rwxr-xr-x 1 nesterfifa nesterfifa  6848 Apr  4 12:36 qjulia_kernel.bin
 -rwxr-xr-x 1 nesterfifa nesterfifa  3935 Apr  4 12:36 qjulia_kernel.bin.bz2
