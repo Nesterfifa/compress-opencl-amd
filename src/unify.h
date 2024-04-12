@@ -15,6 +15,37 @@ namespace fs = std::filesystem;
 using namespace std;
 
 unordered_map<string, vector<unsigned char>> gpu_bytes = {
+    {"gfx601", vector<unsigned char>{33, 58}},
+    {"gfx602", vector<unsigned char>{49, 50}},
+
+    {"gfx700", vector<unsigned char>{34, 48}},
+    {"gfx702", vector<unsigned char>{36, 50}},
+    {"gfx703", vector<unsigned char>{37, 51}},
+    {"gfx704", vector<unsigned char>{38, 52}},
+    {"gfx705", vector<unsigned char>{59, 53}},
+
+    {"gfx801", vector<unsigned char>{40, 1, 26, 48, 49, 203, 0, 175}},
+    {"gfx802", vector<unsigned char>{41, 0, 96, 48, 50, 203, 2, 172}},
+    {"gfx803", vector<unsigned char>{42, 0, 24, 48, 51, 139, 0, 172}},
+    {"gfx805", vector<unsigned char>{60, 0, 96, 48, 53, 203, 2, 172}},
+    {"gfx810", vector<unsigned char>{43, 1, 26, 49, 48, 203, 0, 172}},
+
+    {"gfx90c", vector<unsigned char>{44, 1, 48}},
+    {"gfx900", vector<unsigned char>{45, 1, 50}},
+    {"gfx902", vector<unsigned char>{46, 1, 52}},
+    {"gfx904", vector<unsigned char>{47, 5, 54}},
+    {"gfx906", vector<unsigned char>{49, 1, 57}},
+    {"gfx909", vector<unsigned char>{50, 1, 99}},
+
+    {"gfx940", vector<unsigned char>{64, 48, 117, 222, 117, 222, 117, 222}},
+    {"gfx941", vector<unsigned char>{75, 49, 117, 222, 117, 222, 117, 222}},
+    {"gfx942", vector<unsigned char>{76, 50, 116, 220, 116, 220, 116, 220}},
+
+    {"gfx1010", vector<unsigned char>{51, 48}},
+    {"gfx1011", vector<unsigned char>{52, 49}},
+    {"gfx1012", vector<unsigned char>{53, 50}},
+    {"gfx1013", vector<unsigned char>{66, 51}},
+
     {"gfx1030", vector<unsigned char>{54, 48}},
     {"gfx1031", vector<unsigned char>{55, 49}},
     {"gfx1032", vector<unsigned char>{56, 50}},
@@ -122,6 +153,11 @@ int unify(int argc, char **argv)
 
         // write erased bytes positions and the resulting array into a binary file
         size_t sz = diff_pos.size();
+        if (sz > 10)
+        {
+            cerr << "The binaries are not similar enough :(" << endl;
+            return EXIT_FAILURE;
+        }
         output.write(reinterpret_cast<const char *>(&sz), sizeof(size_t));
 
         for (int const i : diff_pos)
@@ -134,9 +170,9 @@ int unify(int argc, char **argv)
             output << c;
         }
     }
-    catch (const std::exception &)
+    catch (const std::exception &e)
     {
-        cerr << "An error occurred! Sorry ):" << endl;
+        cerr << "An error occurred! Sorry ):" << e.what() << endl;
         status = EXIT_FAILURE;
     }
 
