@@ -15,8 +15,8 @@ namespace fs = std::filesystem;
 using namespace std;
 
 unordered_map<string, vector<unsigned char>> gpu_bytes = {
-    {"gfx601", vector<unsigned char>{33, 58}},
-    {"gfx602", vector<unsigned char>{49, 50}},
+    {"gfx601", vector<unsigned char>{33, 49}},
+    {"gfx602", vector<unsigned char>{58, 50}},
 
     {"gfx700", vector<unsigned char>{34, 48}},
     {"gfx702", vector<unsigned char>{36, 50}},
@@ -30,12 +30,12 @@ unordered_map<string, vector<unsigned char>> gpu_bytes = {
     {"gfx805", vector<unsigned char>{60, 0, 96, 48, 53, 203, 2, 172}},
     {"gfx810", vector<unsigned char>{43, 1, 26, 49, 48, 203, 0, 172}},
 
-    {"gfx90c", vector<unsigned char>{44, 1, 48}},
-    {"gfx900", vector<unsigned char>{45, 1, 50}},
-    {"gfx902", vector<unsigned char>{46, 1, 52}},
-    {"gfx904", vector<unsigned char>{47, 5, 54}},
-    {"gfx906", vector<unsigned char>{49, 1, 57}},
-    {"gfx909", vector<unsigned char>{50, 1, 99}},
+    {"gfx900", vector<unsigned char>{44, 1, 48}},
+    {"gfx902", vector<unsigned char>{45, 1, 50}},
+    {"gfx904", vector<unsigned char>{46, 1, 52}},
+    {"gfx906", vector<unsigned char>{47, 5, 54}},
+    {"gfx909", vector<unsigned char>{49, 1, 57}},
+    {"gfx90c", vector<unsigned char>{50, 1, 99}},
 
     {"gfx940", vector<unsigned char>{64, 48, 117, 222, 117, 222, 117, 222}},
     {"gfx941", vector<unsigned char>{75, 49, 117, 222, 117, 222, 117, 222}},

@@ -102,11 +102,11 @@ void test_unify_deunify(
     size_t argv = 5;
     char **encode_argv = new char *[5];
     std::string output = compressed_path;
+    encode_argv[1] = "unify";
     encode_argv[2] = const_cast<char *>(folder.c_str());
     encode_argv[3] = const_cast<char *>(file_template.c_str());
     encode_argv[4] = const_cast<char *>(output.c_str());
     ASSERT_NO_THROW(unify(5, encode_argv));
-    std::cout << 1 << endl;
 
     for (std::string gpu : gpus)
     {
@@ -114,6 +114,7 @@ void test_unify_deunify(
         string input = compressed_path;
         output = decompressed_path;
 
+        decode_argv[1] = "deunify";
         decode_argv[2] = const_cast<char *>(input.c_str());
         decode_argv[3] = const_cast<char *>(output.c_str());
         decode_argv[4] = const_cast<char *>(gpu.c_str());
