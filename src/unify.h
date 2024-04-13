@@ -52,7 +52,13 @@ unordered_map<string, vector<unsigned char>> gpu_bytes = {
     {"gfx1033", vector<unsigned char>{57, 51}},
     {"gfx1034", vector<unsigned char>{62, 52}},
     {"gfx1035", vector<unsigned char>{61, 53}},
-    {"gfx1036", vector<unsigned char>{69, 54}}};
+    {"gfx1036", vector<unsigned char>{69, 54}},
+
+    {"gfx1100", vector<unsigned char>{65, 48}},
+    {"gfx1102", vector<unsigned char>{71, 50}},
+
+    {"gfx1101", vector<unsigned char>{70, 49}},
+    {"gfx1103", vector<unsigned char>{68, 51}}};
 
 bool match(const wstring &wildcard, const wstring &fileName);
 
@@ -153,6 +159,7 @@ int unify(int argc, char **argv)
 
         // write erased bytes positions and the resulting array into a binary file
         size_t sz = diff_pos.size();
+
         if (sz > 10)
         {
             cerr << "The binaries are not similar enough :(" << endl;

@@ -82,6 +82,18 @@ TEST(unify_1030, validate_unify_deunify)
     test_unify_deunify("../../data/cl/solve-gfx103", "kernel-gfx103*.bin", "compressed.bin.cpr", "decompressed.bin", gpus);
 }
 
+TEST(unify_1100, validate_unify_deunify)
+{
+    std::vector<std::string> gpus = std::vector<std::string>{"gfx1100", "gfx1102"};
+    test_unify_deunify("../../data/cl/solve-gfx1100", "kernel-gfx110*.bin", "compressed.bin.cpr", "decompressed.bin", gpus);
+}
+
+TEST(unify_1102, validate_unify_deunify)
+{
+    std::vector<std::string> gpus = std::vector<std::string>{"gfx1101", "gfx1103"};
+    test_unify_deunify("../../data/cl/solve-gfx1101", "kernel-gfx110*.bin", "compressed.bin.cpr", "decompressed.bin", gpus);
+}
+
 std::vector<unsigned char> random_array(size_t size)
 {
     std::vector<unsigned char> data(size);
@@ -102,7 +114,7 @@ void test_unify_deunify(
     size_t argv = 5;
     char **encode_argv = new char *[5];
     std::string output = compressed_path;
-    encode_argv[1] = "unify";
+    encode_argv[1] = "unify-xz";
     encode_argv[2] = const_cast<char *>(folder.c_str());
     encode_argv[3] = const_cast<char *>(file_template.c_str());
     encode_argv[4] = const_cast<char *>(output.c_str());
@@ -114,7 +126,7 @@ void test_unify_deunify(
         string input = compressed_path;
         output = decompressed_path;
 
-        decode_argv[1] = "deunify";
+        decode_argv[1] = "deunify-xz";
         decode_argv[2] = const_cast<char *>(input.c_str());
         decode_argv[3] = const_cast<char *>(output.c_str());
         decode_argv[4] = const_cast<char *>(gpu.c_str());
