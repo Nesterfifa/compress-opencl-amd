@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <lzma.h>
+#include <map>
+#include <zlib.h>
 
 std::vector<unsigned char> compressData(const std::vector<unsigned char> &data)
 {
@@ -77,4 +79,31 @@ std::vector<unsigned char> decompressData(const std::vector<unsigned char> &comp
     lzma_end(&stream);
 
     return decompressed_data;
+}
+
+void compress_lzw(std::vector<unsigned char> &data, std::vector<int> &out)
+{
+    std::map<std::vector<unsigned char>, int> dict;
+
+    for (unsigned char i = 0;; i++)
+    {
+        dict[{i}] = i;
+        if (i == 255)
+            break;
+    }
+
+    std::vector<unsigned char> buffer;
+    int index = 256;
+
+    for (auto ch : data)
+    {
+        buffer.push_back(ch);
+        if (!dict.count(buffer))
+        {
+            out.push_back(dict[std::vector<unsigned char>(buffer.begin(), buffer.end() - 1)]);
+            dict[buffer] = index++;
+            buffer.erase(buffer.begin(), buffer.end() - 1);
+        }
+    }
+    out.push_back(dict[std::vector<unsigned char>(buffer.begin(), buffer.end())]);
 }

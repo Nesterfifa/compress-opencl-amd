@@ -11,5 +11,5 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
-target_link_libraries(compress-ocl-test PRIVATE GTest::gtest_main LibLZMA::LibLZMA)
+target_link_libraries(compress-ocl-test PRIVATE GTest::gtest_main LibLZMA::LibLZMA OpenCL::OpenCL)
 gtest_discover_tests(compress-ocl-test)

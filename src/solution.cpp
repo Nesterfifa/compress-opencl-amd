@@ -1,44 +1,28 @@
 #include <compress.h>
+#include <unify.h>
 #include <sstream>
 #include <fstream>
 #include <CL/opencl.hpp>
+#include <zlib.h>
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
-    {
-        std::cerr << "Usage: " << argv[0] << " <compressed_kernel.cl.xz>" << std::endl;
-        return 1;
-    }
-
-    std::ifstream kernel_file(argv[1], std::ios::binary);
+    std::ifstream kernel_file("decompress.cl");
     if (!kernel_file.is_open())
     {
         std::cerr << "Failed to open file: " << argv[1] << std::endl;
         return 1;
     }
-
-    std::stringstream compressed_kernel_stream;
-    compressed_kernel_stream << kernel_file.rdbuf();
-    std::vector<unsigned char> compressed_kernel(compressed_kernel_stream.str().begin(), compressed_kernel_stream.str().end());
-
-    std::vector<unsigned char> decompressed_kernel;
-    try
-    {
-        decompressed_kernel = decompressData(compressed_kernel);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Error decompressing xz-compressed kernel: " << e.what() << std::endl;
-        return 1;
-    }
+    
+    std::stringstream kernel_code_stream;
+    kernel_code_stream << kernel_file.rdbuf();
 
     try
     {
         std::vector<cl::Platform> platforms;
         cl::Platform::get(&platforms);
 
-        cl::Platform platform = platforms.front();
+        cl::Platform platform = platforms[0];
 
         std::vector<cl::Device> devices;
         platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
@@ -53,27 +37,16 @@ int main(int argc, char *argv[])
 
         cl::CommandQueue queue(context, device);
 
-        cl::Program::Binaries binaries;
-        binaries.push_back(std::vector<unsigned char>(compressed_kernel.begin(), compressed_kernel.end()));
+        cl::Program::Sources sources;
+        sources.push_back(kernel_code_stream.str());
+
         cl_int err;
-        cl::Program program(context, devices, binaries, NULL, &err);
-        std::cout << err << std::endl;
+        cl::Program program(context, sources);
 
         err = program.build();
-        if (err != CL_SUCCESS)
-        {
-            std::cout << err << std::endl;
-            size_t log_size;
-            clGetProgramBuildInfo(program.get(), device.get(), CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+        std::cout << err << std::endl;
 
-            char *log = (char *)malloc(log_size);
-
-            clGetProgramBuildInfo(program.get(), device.get(), CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
-
-            printf("%s\n", log);
-        }
-
-        cl::Kernel kernel(program, "matvec", &err);
+        cl::Kernel kernel(program, "decompress_lzw", &err);
 
         cl_float A[16] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0};
         cl_float x[4] = {1.0, 2.0, 3.0, 4.0};
@@ -86,7 +59,7 @@ int main(int argc, char *argv[])
         kernel.setArg(2, 4);
         kernel.setArg(3, buffer_y);
 
-        queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);
+        queue.enqueueNDRangeKernel(kernel, cl::NDRange(128 * 128), cl::NullRange, cl::NullRange);
 
         queue.finish();
 

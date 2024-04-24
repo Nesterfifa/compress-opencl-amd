@@ -14,53 +14,54 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-unordered_map<string, vector<unsigned char>> gpu_bytes = {
-    {"gfx601", vector<unsigned char>{33, 49}},
-    {"gfx602", vector<unsigned char>{58, 50}},
+unordered_map<string, unsigned char> gpu_bytes = {
+    {"gfx601", 33},
+    {"gfx602", 58},
 
-    {"gfx700", vector<unsigned char>{34, 48}},
-    {"gfx702", vector<unsigned char>{36, 50}},
-    {"gfx703", vector<unsigned char>{37, 51}},
-    {"gfx704", vector<unsigned char>{38, 52}},
-    {"gfx705", vector<unsigned char>{59, 53}},
+    {"gfx700", 34},
+    {"gfx702", 36},
+    {"gfx703", 37},
+    {"gfx704", 38},
+    {"gfx705", 59},
 
-    {"gfx801", vector<unsigned char>{40, 1, 26, 48, 49, 203, 0, 175}},
-    {"gfx802", vector<unsigned char>{41, 0, 96, 48, 50, 203, 2, 172}},
-    {"gfx803", vector<unsigned char>{42, 0, 24, 48, 51, 139, 0, 172}},
-    {"gfx805", vector<unsigned char>{60, 0, 96, 48, 53, 203, 2, 172}},
-    {"gfx810", vector<unsigned char>{43, 1, 26, 49, 48, 203, 0, 172}},
+    {"gfx801", 40},
+    {"gfx802", 41},
+    {"gfx803", 42},
+    {"gfx805", 60},
+    {"gfx810", 43},
 
-    {"gfx900", vector<unsigned char>{44, 1, 48}},
-    {"gfx902", vector<unsigned char>{45, 1, 50}},
-    {"gfx904", vector<unsigned char>{46, 1, 52}},
-    {"gfx906", vector<unsigned char>{47, 5, 54}},
-    {"gfx909", vector<unsigned char>{49, 1, 57}},
-    {"gfx90c", vector<unsigned char>{50, 1, 99}},
+    {"gfx900", 44},
+    {"gfx902", 45},
+    {"gfx904", 46},
+    {"gfx906", 47},
+    {"gfx909", 49},
+    {"gfx90c", 50},
 
-    {"gfx940", vector<unsigned char>{64, 48, 117, 222, 117, 222, 117, 222}},
-    {"gfx941", vector<unsigned char>{75, 49, 117, 222, 117, 222, 117, 222}},
-    {"gfx942", vector<unsigned char>{76, 50, 116, 220, 116, 220, 116, 220}},
+    {"gfx940", 64},
+    {"gfx941", 75},
+    {"gfx942", 76},
 
-    {"gfx1010", vector<unsigned char>{51, 48}},
-    {"gfx1011", vector<unsigned char>{52, 49}},
-    {"gfx1012", vector<unsigned char>{53, 50}},
-    {"gfx1013", vector<unsigned char>{66, 51}},
+    {"gfx1010", 51},
+    {"gfx1011", 52},
+    {"gfx1012", 53},
+    {"gfx1013", 66},
 
-    {"gfx1030", vector<unsigned char>{54, 48}},
-    {"gfx1031", vector<unsigned char>{55, 49}},
-    {"gfx1032", vector<unsigned char>{56, 50}},
-    {"gfx1033", vector<unsigned char>{57, 51}},
-    {"gfx1034", vector<unsigned char>{62, 52}},
-    {"gfx1035", vector<unsigned char>{61, 53}},
-    {"gfx1036", vector<unsigned char>{69, 54}},
+    {"gfx1030", 54},
+    {"gfx1031", 55},
+    {"gfx1032", 56},
+    {"gfx1033", 57},
+    {"gfx1034", 62},
+    {"gfx1035", 61},
+    {"gfx1036", 69},
 
-    {"gfx1100", vector<unsigned char>{65, 48}},
-    {"gfx1102", vector<unsigned char>{71, 50}},
+    {"gfx1100", 65},
+    {"gfx1102", 71},
 
-    {"gfx1101", vector<unsigned char>{70, 49}},
-    {"gfx1103", vector<unsigned char>{68, 51}}};
+    {"gfx1101", 70},
+    {"gfx1103", 68}};
 
 bool match(const wstring &wildcard, const wstring &fileName);
+vector<uint8_t> int_le(int x);
 
 int unify(int argc, char **argv)
 {
@@ -145,31 +146,40 @@ int unify(int argc, char **argv)
             }
         }
 
-        // delete different bytes
-        vector<unsigned char> result = buffers[0];
-        for (size_t i = 0; i < diff_pos.size(); i++)
-        {
-            result.erase(result.begin() + diff_pos[i] - i);
-        }
-
-        if (strcmp(argv[1], "unify-xz") == 0)
-        {
-            result = compressData(result);
-        }
-
-        // write erased bytes positions and the resulting array into a binary file
         size_t sz = diff_pos.size();
-
-        if (sz > 10)
+        if (sz > 100)
         {
             cerr << "The binaries are not similar enough :(" << endl;
             return EXIT_FAILURE;
         }
-        output.write(reinterpret_cast<const char *>(&sz), sizeof(size_t));
 
-        for (int const i : diff_pos)
+        vector<unsigned char> result;
+        result.push_back(buffers.size()); // assuming we're not compressing more than 255 files
+        result.push_back(sz);
+        for (size_t i = 0; i < sz; i++)
         {
-            output.write(reinterpret_cast<const char *>(&i), sizeof(int));
+            vector<uint8_t> position = int_le(diff_pos[i]);
+            result.insert(result.end(), position.begin(), position.end());
+        }
+
+        for (size_t i = 0; i < buffers.size(); i++)
+        {
+            for (size_t j = 0; j < sz; j++)
+            {
+                result.push_back(buffers[i][diff_pos[j]]);
+            }
+        }
+
+        for (size_t i = 0; i < diff_pos.size(); i++)
+        {
+            buffers[0].erase(buffers[0].begin() + diff_pos[i] - i);
+        }
+
+        result.insert(result.end(), buffers[0].begin(), buffers[0].end());
+
+        if (strcmp(argv[1], "unify-xz") == 0)
+        {
+            result = compressData(result);
         }
 
         for (char const c : result)
@@ -188,14 +198,6 @@ int unify(int argc, char **argv)
 
 vector<unsigned char> deunifyBinary(ifstream &input, string gpu_name, bool decompression)
 {
-    // read erased bytes positions
-    size_t size;
-    input.read(reinterpret_cast<char *>(&size), sizeof(size_t));
-    vector<size_t> positions(size);
-    for (size_t i = 0; i < size; i++)
-    {
-        input.read(reinterpret_cast<char *>(&positions[i]), sizeof(int));
-    }
     vector<unsigned char> buffer((istreambuf_iterator<char>(input)), (istreambuf_iterator<char>()));
 
     if (decompression)
@@ -203,12 +205,39 @@ vector<unsigned char> deunifyBinary(ifstream &input, string gpu_name, bool decom
         buffer = decompressData(buffer);
     }
 
-    for (size_t i = 0; i < size; i++)
+    uint8_t binaries_size = buffer[0];
+    uint8_t diff_size = buffer[1];
+    size_t pointer = 2;
+    uint8_t first_byte = gpu_bytes[gpu_name];
+    unordered_map<uint8_t, vector<uint8_t>> bytes_to_insert;
+    vector<size_t> positions;
+    for (size_t i = 0; i < diff_size; i++)
     {
-        buffer.insert(buffer.begin() + positions[i], gpu_bytes[gpu_name][i]);
+        size_t position = 0;
+        position |= buffer[pointer++];
+        position |= static_cast<size_t>(buffer[pointer++]) << 8;
+        position |= static_cast<size_t>(buffer[pointer++]) << 16;
+        position |= static_cast<size_t>(buffer[pointer++]) << 24;
+        positions.push_back(position);
     }
 
-    return buffer;
+    for (size_t i = 0; i < binaries_size; i++)
+    {
+        uint8_t first = buffer[pointer++];
+        for (size_t j = 1; j < diff_size; j++)
+        {
+            bytes_to_insert[first].push_back(buffer[pointer++]);
+        }
+    }
+
+    vector<uint8_t> result = vector<uint8_t>(buffer.begin() + pointer, buffer.end());
+    result.insert(result.begin() + positions[0], first_byte);
+    for (int i = 1; i < diff_size; i++)
+    {
+        result.insert(result.begin() + positions[i], bytes_to_insert[first_byte][i - 1]);
+    }
+
+    return result;
 }
 
 int deunify(int argc, char **argv)
@@ -258,6 +287,15 @@ int deunify(int argc, char **argv)
     }
 
     return status;
+}
+
+vector<uint8_t> int_le(int x)
+{
+    return vector<uint8_t>{
+        static_cast<uint8_t>(x & 255),
+        static_cast<uint8_t>((x >> 8) & 255),
+        static_cast<uint8_t>((x >> 16) & 255),
+        static_cast<uint8_t>((x >> 24) & 255)};
 }
 
 bool recursiveMatch(const wstring &wildcard, const wstring::const_iterator &wildcardIter, const wstring &fileName, const wstring::const_iterator &fileNameIter)
